@@ -16,7 +16,7 @@ func main() {
 	c := zkutils.Connect()
 	defer c.Close()
 
-	zkutils.EnsurePath(c, "/strube")
+	zkutils.EnsurePath(c, "/struba")
 	currentPath := "/struba/v_current"
 	zkutils.CreateIfNotExists(c, currentPath)
 

@@ -4,18 +4,14 @@ option go_package = "completor/completor";
 
 package completor;
 
-// The greeting service definition.
 service Completor {
-  // Sends a greeting
   rpc AutoComplete (AutoCompleteRequest) returns (AutoCompleteResponse) {}
   rpc BuildTrie (BuildTrieRequest) returns (BuildTrieResponse) {}
 }
 
-// The request message containing the user's name.
 message AutoCompleteRequest {
   string query = 1;
 }
-// The response message containing the greetings
 message AutoCompleteResponse {
   repeated string results = 1;
 }

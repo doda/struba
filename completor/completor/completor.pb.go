@@ -20,7 +20,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// The request message containing the user's name.
 type AutoCompleteRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -68,7 +67,6 @@ func (x *AutoCompleteRequest) GetQuery() string {
 	return ""
 }
 
-// The response message containing the greetings
 type AutoCompleteResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

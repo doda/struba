@@ -18,7 +18,6 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CompletorClient interface {
-	// Sends a greeting
 	AutoComplete(ctx context.Context, in *AutoCompleteRequest, opts ...grpc.CallOption) (*AutoCompleteResponse, error)
 	BuildTrie(ctx context.Context, in *BuildTrieRequest, opts ...grpc.CallOption) (*BuildTrieResponse, error)
 }
@@ -53,7 +52,6 @@ func (c *completorClient) BuildTrie(ctx context.Context, in *BuildTrieRequest, o
 // All implementations must embed UnimplementedCompletorServer
 // for forward compatibility
 type CompletorServer interface {
-	// Sends a greeting
 	AutoComplete(context.Context, *AutoCompleteRequest) (*AutoCompleteResponse, error)
 	BuildTrie(context.Context, *BuildTrieRequest) (*BuildTrieResponse, error)
 	mustEmbedUnimplementedCompletorServer()

@@ -53,8 +53,8 @@ services:
       - donotstart
     image: golang:1.16.3-alpine
     volumes:
-      - .:/go/src/go-with-compose
-    working_dir: /go/src/go-with-compose/logput
+      - .:/go/src
+    working_dir: /go/src/logput
     command: go run logput.go
   frontend:
     depends_on:

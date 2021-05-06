@@ -5,5 +5,5 @@ services:
       ZK_HOST: "zookeeper"
       CH_HOST: "clickhouse"
     volumes:
-      - .:/go/src/go-with-compose
-    working_dir: /go/src/go-with-compose/completor
+      - .:/go/src
+    working_dir: /go/src/completor

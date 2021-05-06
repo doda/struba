@@ -1,0 +1,108 @@
+version: "3.4"
+services:
+  zookeeper:
+    image: "confluentinc/cp-zookeeper:5.5.0"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: "2181"
+      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: "WARN"
+      ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL: "WARN"
+    volumes:
+      - "struba-zookeeper:/var/lib/zookeeper/data"
+      - "struba-zookeeper-log:/var/lib/zookeeper/log"
+      - "struba-secrets:/etc/zookeeper/secrets"
+    ports:
+      - "2181:2181"
+  kafka:
+    depends_on:
+      - zookeeper
+    image: "confluentinc/cp-kafka:5.5.0"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: "1"
+      KAFKA_LOG_RETENTION_HOURS: "24"
+      KAFKA_MESSAGE_MAX_BYTES: "50000000" #50MB or bust
+      KAFKA_MAX_REQUEST_SIZE: "50000000" #50MB on requests apparently too
+      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+      KAFKA_LOG4J_LOGGERS: "kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN"
+      KAFKA_LOG4J_ROOT_LOGLEVEL: "WARN"
+      KAFKA_TOOLS_LOG4J_LOGLEVEL: "WARN"
+    volumes:
+      - "struba-kafka:/var/lib/kafka/data"
+      - "struba-kafka-log:/var/lib/kafka/log"
+      - "struba-secrets:/etc/kafka/secrets"
+    ports:
+      - "9092:9092"
+  clickhouse:
+    image: "yandex/clickhouse-server:21.4.4.30"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - "struba-clickhouse:/var/lib/clickhouse"
+      - "struba-clickhouse-log:/var/log/clickhouse-server"
+    ports:
+      - "8999:9000"
+  logput:
+    depends_on:
+      - kafka
+    profiles:
+      - donotstart
+    image: golang:1.16.3-alpine
+    volumes:
+      - .:/go/src/go-with-compose
+    working_dir: /go/src/go-with-compose/logput
+    command: go run logput.go
+  frontend:
+    depends_on:
+      - zookeeper
+    extends:
+      file: "common.yml"
+      service: app
+    command: go run frontend/main.go
+    ports:
+      - "3200:3200"
+  backend1:
+    depends_on:
+      - zookeeper
+    extends:
+      file: "common.yml"
+      service: app
+    environment:
+      HOSTNAME: "backend1"
+      PORT: "9055"
+      RANGE_START: "A"
+      RANGE_END: "a"
+    command: go run server/main.go server/trie.go server/build_trie.go
+  backend2:
+    depends_on:
+      - zookeeper
+    extends:
+      file: "common.yml"
+      service: app
+    environment:
+      HOSTNAME: "backend2"
+      PORT: "9055"
+      RANGE_START: "a"
+      RANGE_END: "~"
+    command: go run server/main.go server/trie.go server/build_trie.go
+  kickeroffer:
+    depends_on:
+      - zookeeper
+    extends:
+      file: "common.yml"
+      service: app
+    profiles:
+      - donotstart
+    command: go run kickeroffer/main.go
+volumes:
+  struba-zookeeper:
+  struba-kafka:
+  struba-secrets:
+  struba-zookeeper-log:
+  struba-kafka-log:
+  struba-clickhouse:
+  struba-clickhouse-log:

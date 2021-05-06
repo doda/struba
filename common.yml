@@ -1,0 +1,9 @@
+services:
+  app:
+    image: golang:1.16.3-alpine
+    environment:
+      ZK_HOST: "zookeeper"
+      CH_HOST: "clickhouse"
+    volumes:
+      - .:/go/src/go-with-compose
+    working_dir: /go/src/go-with-compose/completor
